@@ -2,6 +2,7 @@
 
 library(rvest)
 library(httr)
+library(stringr)
 
 # html 불러오기
 url = "https://news.naver.com/main/main.nhn?mode=LSD&mid=shm&sid1=105#&date=%2000:00:00&page=2"
@@ -16,11 +17,6 @@ tnodes = html_nodes(hdoc,css = css)
 # text 추출
 t_text = html_text(tnodes)
 t_text
-
-
-read_html(url)
-hdoc
-html_node()
 
 ### 쇼핑몰 정보 ###
 library(stringr)
@@ -43,7 +39,7 @@ for (i in 1:5) {
   mall_href = append(mall_href,href)
 }
 
-#해당문구가 들어간 글자위치 찾기
+  #해당문구가 들어간 글자위치 찾기
 a=str_locate(mall_href,pattern = "\\.kr")[,2]
 b=str_locate(mall_href,pattern = "\\.com")[,2]
 
@@ -53,6 +49,52 @@ b[is.na(b)] = 0
 mall_href = str_sub(mall_href,end = a+b)  
 mall_list = data.frame(mall_name,mall_href,mall_img)
 View(mall_list)
+
+### 검색어 key word ###
+
+Naver_Real_Time_Search <- (html_nodes(read_html("http://www.naver.com"), ".ah_k") %>% html_text())[1:20]
+Naver_Real_Time_Search_Area_Time <- (html_nodes(read_html("http://www.naver.com"), ".ah_time") %>% html_text())
+
+Naver_News_Topic <- (html_nodes(read_html("https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query=a"), ".keyword span") %>% html_text())[c(1:10)]
+Naver_News_Topic_Area_Time <- (html_nodes(read_html("https://search.naver.com/search.naver?where=nexearch&sm=top_hty&fbm=1&ie=utf8&query=a"), ".realtime_srch_area time") %>% html_text())[1]
+
+
+### 쇼핑검색어 key word ###
+read_html(x = "https://datalab.naver.com/") %>% html_nodes(".list_area .title")
+
+
+best100_URL = "https://search.shopping.naver.com/best100v2/main.nhn"
+best100_item = read_html(x = best100_URL) %>% html_nodes("._popular_srch_lst_li") %>% html_text()
+best100_time = read_html(x = best100_URL) %>% html_nodes(".h_real em") %>% html_text()
+
+str_split(best100_time, pattern = "현재")
+best100_time = gsub("\\.","\\-",str_sub(best100_time,end = 17)[1])
+best100_time = gsub("\\-+\\s","\\ ",best100_time)
+
+### 쇼핑검색어 세부 Item ###
+
+best100_Detail_URL = "https://search.shopping.naver.com/search/all.nhn?frm=NVBT100&query="
+
+i=1
+url1 = read_html(str_c(best100_Detail_URL,URLencode(best100_item[i])))
+
+for (i in 1:5) {
+  read_html(str_c(best100_Detail_URL,URLencode(best100_item[i]))) %>% html_nodes("#_search_keyword_list_keyword a") 
+}
+
+read_html("https://search.shopping.naver.com/search/all.nhn?frm=NVBT100&query=%EC%97%AC%EC%84%B1%ED%8C%A8%EB%94%A9") %>% html_nodes("#section_popular_keyword") 
+
+
+best100_Detail_ITEM
+best100_item[1]
+
+encoding(best100_item[1],from = 'utf-8')
+
+URLencode(best100_item[1])
+
+https://search.shopping.naver.com/search/all.nhn?frm=NVBT100&query=%EC%97%AC%EC%84%B1%ED%8C%A8%EB%94%A9
+read_html("https://search.shopping.naver.com/search/all.nhn?frm=NVBT100&query=%EC%97%AC%EC%84%B1%ED%8C%A8%EB%94%A9")
+
 
 
 ### API ###

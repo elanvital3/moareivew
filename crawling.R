@@ -4,19 +4,19 @@ library(rvest)
 library(httr)
 library(stringr)
 
-# html 불러오기
-url = "https://news.naver.com/main/main.nhn?mode=LSD&mid=shm&sid1=105#&date=%2000:00:00&page=2"
-
-hdoc = read_html(url)
-
-
-# 필요한 node 찾기 불러오기
-css = ".title"
-tnodes = html_nodes(hdoc,css = css)
-
-# text 추출
-t_text = html_text(tnodes)
-t_text
+  # html 불러오기
+  url = "https://news.naver.com/main/main.nhn?mode=LSD&mid=shm&sid1=105#&date=%2000:00:00&page=2"
+  
+  hdoc = read_html(url)
+  
+  
+  # 필요한 node 찾기 불러오기
+  css = ".title"
+  tnodes = html_nodes(hdoc,css = css)
+  
+  # text 추출
+  t_text = html_text(tnodes)
+  t_text
 
 ### 쇼핑몰 정보 ###
 library(stringr)
@@ -40,11 +40,11 @@ for (i in 1:5) {
 }
 
   #해당문구가 들어간 글자위치 찾기
-a=str_locate(mall_href,pattern = "\\.kr")[,2]
-b=str_locate(mall_href,pattern = "\\.com")[,2]
+  a=str_locate(mall_href,pattern = "\\.kr")[,2]
+  b=str_locate(mall_href,pattern = "\\.com")[,2]
 
-a[is.na(a)] = 0
-b[is.na(b)] = 0
+  a[is.na(a)] = 0
+  b[is.na(b)] = 0
 
 mall_href = str_sub(mall_href,end = a+b)  
 mall_list = data.frame(mall_name,mall_href,mall_img)
@@ -60,9 +60,12 @@ Naver_News_Topic_Area_Time <- (html_nodes(read_html("https://search.naver.com/se
 
 
 ### 쇼핑검색어 key word ###
-read_html(x = "https://datalab.naver.com/") %>% html_nodes(".list_area .title")
+items_today = read_html(x = "https://datalab.naver.com/") %>% html_nodes(".keyword_rank:nth-child(12) .title") %>% html_text()
 
 
+items_today[1]
+
+### 쇼핑검색어 100 key word ###
 best100_URL = "https://search.shopping.naver.com/best100v2/main.nhn"
 best100_item = read_html(x = best100_URL) %>% html_nodes("._popular_srch_lst_li") %>% html_text()
 best100_time = read_html(x = best100_URL) %>% html_nodes(".h_real em") %>% html_text()
@@ -70,6 +73,55 @@ best100_time = read_html(x = best100_URL) %>% html_nodes(".h_real em") %>% html_
 str_split(best100_time, pattern = "현재")
 best100_time = gsub("\\.","\\-",str_sub(best100_time,end = 17)[1])
 best100_time = gsub("\\-+\\s","\\ ",best100_time)
+
+best100_item
+
+### Review 
+url1 = "http://browse.gmarket.co.kr/search"
+
+keyword = character()
+site_keyword = character()
+review_num = character()
+rank=1
+
+for (rank in 1:10) {
+  keyword[rank] = URLencode(items_today[rank])
+  
+  s_keyword = read_html(str_c(url1,"?keyword=",keyword[rank])) %>% html_nodes(".box__component-itemcard--general~ .box__component-itemcard--general+ .box__component-itemcard--general .box__tier-container+ .box__item-container .text__item") %>% html_text() %>% str_trim()
+  
+  r_num = read_html(str_c(url1,"?keyword=",keyword[rank])) %>% html_nodes(".box__component-itemcard--general+ .box__component-itemcard--general .box__tier-container+ .box__item-container .list-item__feedback-count .text") %>% html_text()
+  
+  site_keyword = append(site_keyword,s_keyword)
+  review_num = append(review_num,r_num)
+}
+
+
+read_html("http://item.gmarket.co.kr/Item?goodscode=1691060106") %>% html_nodes(".comment-tit")
+
+read_html(str_c(url1,"?keyword=",keyword[4])) %>% html_nodes("div a")
+
+.box__component-itemcard--general~ .box__component-itemcard--general+ .box__component-itemcard--general .box__tier-container+ .box__item-container .image__item
+
+#section__inner-content-body-container > div:nth-child(2) > div:nth-child(4) > div.box__item-container > div.box__image > a
+
+items_today
+keyword
+site_keyword
+review_num
+
+read_html(str_c(url1,"?keyword=",keyword[4])) %>% html_nodes(".box__component-itemcard--general~ .box__component-itemcard--general+ .box__component-itemcard--general .box__tier-container+ .box__item-container .text__item") %>% html_text()
+
+
+read_html(str_c(url1,"?keyword=",keyword1)) %>% html_nodes(".box__component-itemcard--general:nth-child(19) .text__brand") %>% html_text() %>% str_trim()
+
+read_html(str_c(url1,"?keyword=",keyword1)) %>% html_nodes(".box__component-itemcard--general+ .box__component-itemcard--general .box__tier-container+ .box__item-container .list-item__feedback-count .text") %>% html_text()
+
+
+
+
+
+
+
 
 ### 쇼핑검색어 세부 Item ###
 

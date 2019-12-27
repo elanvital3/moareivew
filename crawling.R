@@ -76,13 +76,26 @@ best100_time = gsub("\\-+\\s","\\ ",best100_time)
 best100_Detail_URL = "https://search.shopping.naver.com/search/all.nhn?frm=NVBT100&query="
 
 i=1
+str_c(best100_Detail_URL,URLencode(best100_item[i]))
+
 url1 = read_html(str_c(best100_Detail_URL,URLencode(best100_item[i])))
+
+
+//*[@id="section_popular_brand"]/ul[2]/li[1]/span[1]/a
 
 for (i in 1:5) {
   read_html(str_c(best100_Detail_URL,URLencode(best100_item[i]))) %>% html_nodes("#_search_keyword_list_keyword a") 
 }
 
-read_html("https://search.shopping.naver.com/search/all.nhn?frm=NVBT100&query=%EC%97%AC%EC%84%B1%ED%8C%A8%EB%94%A9") %>% html_nodes("#section_popular_keyword") 
+read_html("https://search.shopping.naver.com/search/all.nhn?frm=NVBT100&query=%EC%97%AC%EC%84%B1%ED%8C%A8%EB%94%A9") %>% html_nodes(xpath = "//*[@id="section_popular_brand"]/ul[2]/li[1]/span[1]/a") 
+
+read_html("https://search.shopping.naver.com/search/all.nhn?frm=NVBT100&query=%EC%97%AC%EC%84%B1%ED%8C%A8%EB%94%A9") %>% html_nodes(xpath = //*[@id="_search_list"]/div[1]/ul/li[8]/div[2]/span[1]/em/span[2])
+
+a = read_html("https://search.shopping.naver.com/search/all.nhn?frm=NVBT100&query=%EC%97%AC%EC%84%B1%ED%8C%A8%EB%94%A9")
+
+a %>% html_nodes(xpath = //*[@id="_search_keyword_list_keyword"]/li[1]/span[1]/a) 
+
+
 
 
 best100_Detail_ITEM
